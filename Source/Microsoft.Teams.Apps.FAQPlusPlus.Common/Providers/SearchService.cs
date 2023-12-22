@@ -154,7 +154,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Providers
         {
             if (!this.searchServiceClient.Indexes.Exists(TicketsIndexName))
             {
-                var tableIndex = new Index()
+                var tableIndex = new Microsoft.Azure.Search.Models.Index()
                 {
                     Name = TicketsIndexName,
                     Fields = FieldBuilder.BuildForType<TicketEntity>(),
