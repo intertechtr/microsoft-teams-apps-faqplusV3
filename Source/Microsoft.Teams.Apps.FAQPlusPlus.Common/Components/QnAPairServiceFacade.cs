@@ -107,7 +107,11 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
             IMessageActivity message)
         {
             string text = message.Text?.Trim() ?? string.Empty;
-
+            string userName = "UserName:";
+            if (message.From != null && message.From.Name != null) {
+                userName = message.From.Name + "-";
+                userName += message.From.AadObjectId;
+            }
             try
             {
                 ResponseCardPayload payload = new ResponseCardPayload();
@@ -117,7 +121,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
                     payload = ((JObject)message.Value).ToObject<ResponseCardPayload>();
                 }
 
-                var answer = await ConsolidatedAnswer(text);
+                var answer = await ConsolidatedAnswer(text, userName);
                 //answer += "<ul><li>[Bing](https://www.bing.com/)</li><li>![Duck on a rock](http://aka.ms/Fo983c)</li></ul>";
                 IMessageActivity messageActivity = MessageFactory.Attachment(ResponseCard.GetCard(answer, text, this.appBaseUri, payload));
                 messageActivity.TextFormat = "markdown";
@@ -145,11 +149,11 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
             }
         }
 
-        async Task<string> ConsolidatedAnswer(string userMessage)
+        async Task<string> ConsolidatedAnswer(string userMessage, string userName )
         {
             var question = userMessage;
             var context = await GetSearchResult(question);
-            var promptText = CreateQuestionAndContext(question, context);
+            var promptText = CreateQuestionAndContext(question, context, userName);
             var responseFromGPT = await GetAnswerFromGPT(promptText);
             return responseFromGPT;
         }
@@ -231,9 +235,9 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
 
         }
 
-        string CreateQuestionAndContext(string question, string context)
+        string CreateQuestionAndContext(string question, string context, string username)
         {
-            return string.Format("[Question] {0} \r\n\r\n[Context] {1} \r\n", question, context);
+            return string.Format("[Question] {0} \r\n\r\n[Context] {1} \r\n", question, context, username);
         }
 
         public async Task<string> GetAnswerFromGPT(string promptText)
