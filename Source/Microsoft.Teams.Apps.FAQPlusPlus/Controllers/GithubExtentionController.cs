@@ -11,7 +11,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
         public IActionResult Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] Request userRequest)
         {
             // Implement your logic here
-            return Ok();
+            return Ok("Hello World");
         }
 
         [HttpGet("callback")]
