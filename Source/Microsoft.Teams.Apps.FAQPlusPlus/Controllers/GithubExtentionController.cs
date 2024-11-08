@@ -13,5 +13,12 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             // Implement your logic here
             return Ok();
         }
+
+        [HttpGet("callback")]
+        public IActionResult Callback()
+        {
+            string message = "You may close this tab and return to GitHub.com (where you should refresh the page and start a fresh chat). If you're using VS Code or Visual Studio, return there.";
+            return Ok(message);
+        }
     }
 }
