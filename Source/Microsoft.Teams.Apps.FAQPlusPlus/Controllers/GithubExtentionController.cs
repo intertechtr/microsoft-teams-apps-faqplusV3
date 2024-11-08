@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Teams.Apps.FAQPlusPlus.Models;
 
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
