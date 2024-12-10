@@ -9,28 +9,8 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Models
     public static class ConfigurationEntityTypes
     {
         /// <summary>
-        /// Team entity.
-        /// </summary>
-        public const string TeamId = "TeamId";
-
-        /// <summary>
-        /// Knowledge base entity.
-        /// </summary>
-        public const string KnowledgeBaseId = "KnowledgeBaseId";
-
-        /// <summary>
         /// Welcome message entity.
         /// </summary>
         public const string WelcomeMessageText = "WelcomeMessageText";
-
-        /// <summary>
-        /// Help tab text entity.
-        /// </summary>
-        public const string HelpTabText = "HelpTabText";
-
-        /// <summary>
-        /// QuestionAnswer endpoint key entity.
-        /// </summary>
-        public const string QuestionAnswerEndpointKey = "QuestionAnswerEndpointKey";
     }
 }

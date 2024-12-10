@@ -32,11 +32,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Providers
             {
                 this.credentials.Add(this.options.UserAppId, this.options.UserAppPassword);
             }
-
-            if (!string.IsNullOrEmpty(this.options.ExpertAppId))
-            {
-                this.credentials.Add(this.options.ExpertAppId, this.options.ExpertAppPassword);
-            }
         }
 
         /// <summary>

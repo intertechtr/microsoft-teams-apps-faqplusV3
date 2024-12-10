@@ -18,14 +18,12 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Options;
     using Microsoft.Teams.Apps.FAQPlusPlus.Bots;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models.Configuration;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Models.Credentials;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Providers;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Components;
     using Microsoft.Teams.Apps.FAQPlusPlus.Common.Extensions;
-    using Microsoft.Teams.Apps.FAQPlusPlus.Common.TeamsActivity;
     using global::Azure;
 
     /// <summary>
@@ -95,78 +93,35 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus
         {
             services.AddRazorPages();
             services.AddApplicationInsightsTelemetry();
-            services.Configure<KnowledgeBaseSettings>(knowledgeBaseSettings =>
-            {
-                knowledgeBaseSettings.SearchServiceName = this.Configuration["SearchServiceName"];
-                knowledgeBaseSettings.SearchServiceQueryApiKey = this.Configuration["SearchServiceQueryApiKey"];
-                knowledgeBaseSettings.SearchServiceAdminApiKey = this.Configuration["SearchServiceAdminApiKey"];
-                knowledgeBaseSettings.SearchIndexingIntervalInMinutes = this.Configuration["SearchIndexingIntervalInMinutes"];
-                knowledgeBaseSettings.StorageConnectionString = this.Configuration["StorageConnectionString"];
-                knowledgeBaseSettings.IsGCCHybridDeployment = this.Configuration.GetValue<bool>("IsGCCHybridDeployment");
-            });
-
-            services.Configure<QuestionAnswerSettings>(questionAnswerSettings =>
-            {
-                questionAnswerSettings.ScoreThreshold = this.Configuration["ScoreThreshold"];
-            });
 
             services.Configure<BotSettings>(botSettings =>
             {
-                botSettings.AccessCacheExpiryInDays = Convert.ToInt32(this.Configuration["AccessCacheExpiryInDays"]);
                 botSettings.AppBaseUri = this.Configuration["AppBaseUri"];
-                botSettings.ExpertAppId = this.Configuration["ExpertAppId"];
-                botSettings.ExpertAppPassword = this.Configuration["ExpertAppPassword"];
                 botSettings.UserAppId = this.Configuration["UserAppId"];
                 botSettings.UserAppPassword = this.Configuration["UserAppPassword"];
                 botSettings.TenantId = this.Configuration["TenantId"];
-
-                botSettings.AOAI_ENDPOINT = (this.Configuration["AOAI_ENDPOINT"]);
+                botSettings.AOAI_ENDPOINT = this.Configuration["AOAI_ENDPOINT"];
                 botSettings.AOAI_KEY = this.Configuration["AOAI_KEY"];
                 botSettings.AOAI_DEPLOYMENTID = this.Configuration["AOAI_DEPLOYMENTID"];
                 botSettings.SEARCH_INDEX_NAME = this.Configuration["SEARCH_INDEX_NAME"];
                 botSettings.SEARCH_SERVICE_NAME = this.Configuration["SEARCH_SERVICE_NAME"];
                 botSettings.SEARCH_QUERY_KEY = this.Configuration["SEARCH_QUERY_KEY"];
-
                 botSettings.SettingForPrompt = this.Configuration["SettingForPrompt"];
                 botSettings.SettingForTemperature = this.Configuration["SettingForTemperature"];
                 botSettings.SettingForMaxToken = this.Configuration["SettingForMaxToken"];
                 botSettings.SettingForTopK = this.Configuration["SettingForTopK"];
                 botSettings.AOAI_EmbeddingModelName = this.Configuration["AOAI_EmbeddingModelName"];
-
             });
-            services.AddSingleton<Common.Providers.IConfigurationDataProvider>(new Common.Providers.ConfigurationDataProvider(this.Configuration["StorageConnectionString"]));
+
             services.AddHttpClient();
             services.AddSingleton<ICredentialProvider, ConfigurationCredentialProvider>();
-            services.AddSingleton<ITicketsProvider>(new TicketsProvider(this.Configuration["StorageConnectionString"]));
             services.AddSingleton<IBotFrameworkHttpAdapter, BotFrameworkHttpAdapter>();
             services.AddSingleton<UserAppCredentials>();
-            services.AddSingleton<ExpertAppCredentials>();
 
-            services.AddSingleton<IQuestionAnswerServiceProvider>((provider) => new QuestionAnswerServiceProvider(
-                                                                                        provider.GetRequiredService<IConfigurationDataProvider>(),
-                                                                                        provider.GetRequiredService<IOptionsMonitor<QuestionAnswerSettings>>(),
-                                                                                        this.endpoint,
-                                                                                        this.credential,
-                                                                                        this.projectName,
-                                                                                        this.deploymentName,
-                                                                                        this.qnAServicerSubscriptionKey));
-
-            services.AddSingleton<IActivityStorageProvider>((provider) => new ActivityStorageProvider(provider.GetRequiredService<IOptionsMonitor<KnowledgeBaseSettings>>()));
-            services.AddSingleton<IKnowledgeBaseSearchService>((provider) => new KnowledgeBaseSearchService(
-                                                                                        this.Configuration["SearchServiceName"],
-                                                                                        this.Configuration["SearchServiceQueryApiKey"],
-                                                                                        this.Configuration["SearchServiceAdminApiKey"],
-                                                                                        this.Configuration["StorageConnectionString"],
-                                                                                        this.Configuration.GetValue<bool>("IsGCCHybridDeployment")));
-
-            services.AddSingleton<ISearchService, SearchService>();
             services.AddSingleton<IMemoryCache, MemoryCache>();
             services.AddTransient(sp => (BotFrameworkAdapter)sp.GetRequiredService<IBotFrameworkHttpAdapter>());
-            services.AddTransient<FaqPlusExpertBot>();
             services.AddTransient<FaqPlusUserBot>();
             services.AddTransient<TurnContextExtension>();
-            services.AddTransient<ITaskModuleActivity, TaskModuleActivity>();
-            services.AddTransient<IMessagingExtensionActivity, MessagingExtensionActivity>();
             ComponentsRegistery.AddComponentServices(services);
 
             // Create the telemetry middleware(used by the telemetry initializer) to track conversation events

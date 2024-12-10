@@ -15,11 +15,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
     public static class CardHelper
     {
         /// <summary>
-        /// Maximum length of the knowledge base answer to show.
-        /// </summary>
-        public const int KnowledgeBaseAnswerMaxDisplayLength = 500;
-
-        /// <summary>
         /// Maximum length of the user title.
         /// </summary>
         public const int TitleMaxDisplayLength = 50;
@@ -45,44 +40,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
             }
 
             return text;
-        }
-
-        /// <summary>
-        /// Gets the ticket status for the user notifications.
-        /// </summary>
-        /// <param name="ticket">The current ticket information.</param>
-        /// <returns>A status string.</returns>
-        public static string GetUserTicketDisplayStatus(TicketEntity ticket)
-        {
-            if (ticket?.Status == (int)TicketState.Open)
-            {
-                return ticket.IsAssigned() ?
-                    Strings.AssignedUserNotificationStatus :
-                    Strings.UnassignedUserNotificationStatus;
-            }
-            else
-            {
-                return Strings.ClosedUserNotificationStatus;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current status of the ticket to display in the SME team.
-        /// </summary>
-        /// <param name="ticket">The current ticket information.</param>
-        /// <returns>A status string.</returns>
-        public static string GetTicketDisplayStatusForSme(TicketEntity ticket)
-        {
-            if (ticket?.Status == (int)TicketState.Open)
-            {
-                return ticket.IsAssigned() ?
-                    string.Format(CultureInfo.InvariantCulture, Strings.SMETicketAssignedStatus, ticket?.AssignedToName) :
-                    Strings.SMETicketUnassignedStatus;
-            }
-            else
-            {
-                return Strings.SMETicketClosedStatus;
-            }
         }
 
         /// <summary>

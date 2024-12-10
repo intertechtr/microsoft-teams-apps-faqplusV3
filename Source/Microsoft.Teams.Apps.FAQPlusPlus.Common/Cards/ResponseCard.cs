@@ -77,8 +77,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
 
         public static Attachment GetCard(string answer, string userQuestion, string appBaseUri, ResponseCardPayload payload)
         {
-            
-            
             AdaptiveCard responseCard = new AdaptiveCard(new AdaptiveSchemaVersion(1, 2))
             {
                 Body = BuildResponseCardBody(userQuestion, answer, appBaseUri, payload,true),
@@ -108,7 +106,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
             var answerModel = isRichCard ? JsonConvert.DeserializeObject<AnswerModel>(response?.Answer) : new AnswerModel();
 
             var cardBodyToConstruct = new List<AdaptiveElement>()
-            {             
+            {
                 new AdaptiveTextBlock
                 {
                     Wrap = true,
@@ -146,96 +144,15 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
                 HorizontalAlignment = textAlignment,
             });
 
-            // If there follow up prompts, then the follow up prompts will render accordingly.
-            if (response?.Dialog.Prompts.Count > 0)
-            {
-                List<KnowledgeBaseAnswerDTO> previousQuestions = BuildListOfPreviousQuestions((int)response.QnaId, userQuestion, answer, payload);
-
-                foreach (var item in response.Dialog.Prompts)
-                {
-                    var container = new AdaptiveContainer
-                    {
-                        Items = new List<AdaptiveElement>()
-                        {
-                            new AdaptiveColumnSet
-                            {
-                                Columns = new List<AdaptiveColumn>()
-                                {
-                                    // This column will be for the icon.
-                                    new AdaptiveColumn
-                                    {
-                                        Width = AdaptiveColumnWidth.Auto,
-                                        VerticalContentAlignment = AdaptiveVerticalContentAlignment.Center,
-                                        Items = new List<AdaptiveElement>()
-                                        {
-                                            new AdaptiveImage
-                                            {
-                                                Url = new Uri(appBaseUri + "/content/Followupicon.png"),
-                                                PixelWidth = IconWidth,
-                                                PixelHeight = IconHeight,
-                                            },
-                                        },
-                                        Spacing = AdaptiveSpacing.Small,
-                                    },
-                                    new AdaptiveColumn
-                                    {
-                                        Width = AdaptiveColumnWidth.Stretch,
-                                        VerticalContentAlignment = AdaptiveVerticalContentAlignment.Center,
-                                        Items = new List<AdaptiveElement>()
-                                        {
-                                            new AdaptiveTextBlock
-                                            {
-                                                Wrap = true,
-                                                Text = string.Format(Strings.SelectActionItemDisplayTextFormatting, item.DisplayText?.Trim()),
-                                                HorizontalAlignment = textAlignment,
-                                            },
-                                        },
-                                        Spacing = AdaptiveSpacing.Small,
-                                    },
-                                },
-                            },
-                        },
-                        SelectAction = new AdaptiveSubmitAction
-                        {
-                            Title = item.DisplayText,
-                            Data = new ResponseCardPayload
-                            {
-                                MsTeams = new CardAction
-                                {
-                                    Type = ActionTypes.MessageBack,
-                                    DisplayText = item.DisplayText,
-                                    Text = item.DisplayText,
-                                },
-                                PreviousQuestions = new List<KnowledgeBaseAnswerDTO> { previousQuestions.Last() },
-                                IsPrompt = true,
-                            },
-                        },
-                        Separator = true,
-                    };
-
-                    cardBodyToConstruct.Add(container);
-                }
-            }
-
             return cardBodyToConstruct;
         }
 
         private static List<AdaptiveElement> BuildResponseCardBody(string userQuestion, string answer, string appBaseUri, ResponseCardPayload payload, bool isRichCard)
         {
             var textAlignment = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft ? AdaptiveHorizontalAlignment.Right : AdaptiveHorizontalAlignment.Left;
-            //var answerModel = isRichCard ? JsonConvert.DeserializeObject<AnswerModel>(response?.Answer) : new AnswerModel();
 
             var cardBodyToConstruct = new List<AdaptiveElement>()
             {
-               
-                //new AdaptiveTextBlock
-                //{
-                //    Wrap = true,
-                //    Text = answerModel.Title ?? string.Empty,
-                //    Size = AdaptiveTextSize.Large,
-                //    Weight = AdaptiveTextWeight.Bolder,
-                //    HorizontalAlignment = textAlignment,
-                //},
                 new AdaptiveTextBlock
                 {
                     Text = string.Empty,
@@ -244,7 +161,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
                 },
             };
 
-         
             cardBodyToConstruct.Add(new AdaptiveTextBlock
             {
                 Text = answer,
@@ -268,23 +184,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
         {
             List<AdaptiveAction> actionsList = new List<AdaptiveAction>();
             /*{
-                // Adds the "Ask an expert" button.
-                new AdaptiveSubmitAction
-                {
-                    Title = Strings.AskAnExpertButtonText,
-                    Data = new ResponseCardPayload
-                    {
-                        MsTeams = new CardAction
-                        {
-                            Type = ActionTypes.MessageBack,
-                            DisplayText = Strings.AskAnExpertDisplayText,
-                            Text = Constants.AskAnExpert,
-                        },
-                        UserQuestion = userQuestion,
-                        KnowledgeBaseAnswer = answer,
-                    },
-                },
-
                 // Adds the "Share feedback" button.
                 new AdaptiveSubmitAction
                 {
@@ -304,33 +203,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Cards
             };*/
 
             return actionsList;
-        }
-
-        // TOD :: Grey area :: Update the logic
-
-        /// <summary>
-        /// This method will build the list of previous questions.
-        /// </summary>
-        /// <param name="id">The QnA Id of the previous question.</param>
-        /// <param name="userQuestion">The question that was asked by the user originally.</param>
-        /// <param name="answer">The knowledge base answer.</param>
-        /// <param name="payload">The response card payload.</param>
-        /// <returns>A list of previous questions.</returns>
-        private static List<KnowledgeBaseAnswerDTO> BuildListOfPreviousQuestions(int id, string userQuestion, string answer, ResponseCardPayload payload)
-        {
-            var previousQuestions = payload.PreviousQuestions ?? new List<KnowledgeBaseAnswerDTO>();
-
-            previousQuestions.Add(new KnowledgeBaseAnswerDTO
-            {
-                QnaId = id,
-                Questions = new List<string>()
-                {
-                    userQuestion,
-                },
-                Answer = answer,
-            });
-
-            return previousQuestions;
         }
     }
 }

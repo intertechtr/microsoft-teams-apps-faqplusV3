@@ -19,7 +19,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
         public static IServiceCollection AddComponentServices(this IServiceCollection services)
         {
             services.AddTransient<IBotCommandResolver, BotCommandResolver>();
-            services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<IQnAPairServiceFacade, QnAPairServiceFacade>();
             services.AddTransient<IConversationService, ConversationService>();
 

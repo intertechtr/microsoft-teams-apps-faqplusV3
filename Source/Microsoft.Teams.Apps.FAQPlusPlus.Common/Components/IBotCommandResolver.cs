@@ -22,14 +22,5 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
         /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         Task ResolveBotCommandInPersonalChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
-
-        /// <summary>
-        /// Resolves bot commands in channel.
-        /// </summary>
-        /// <param name="message">A message in a conversation.</param>
-        /// <param name="turnContext">Context object containing information cached for a single turn of conversation with a user.</param>
-        /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        Task ResolveBotCommandInTeamChatAsync(IMessageActivity message, ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken);
     }
 }

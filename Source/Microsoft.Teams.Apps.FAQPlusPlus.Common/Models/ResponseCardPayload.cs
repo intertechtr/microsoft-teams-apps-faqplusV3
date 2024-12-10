@@ -17,16 +17,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Models
         public string UserQuestion { get; set; }
 
         /// <summary>
-        /// Gets or sets the response given by the bot to the user.
-        /// </summary>
-        public string KnowledgeBaseAnswer { get; set; }
-
-        /// <summary>
-        /// Gets or sets list of previous questions when a follow up prompt is selected.
-        /// </summary>
-        public List<KnowledgeBaseAnswerDTO> PreviousQuestions { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether question is from prompt.
         /// </summary>
         public bool IsPrompt { get; set; }

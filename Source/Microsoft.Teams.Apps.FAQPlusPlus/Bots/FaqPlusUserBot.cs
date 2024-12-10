@@ -99,10 +99,10 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
         {
             try
             {
-                //this code is about tenant id check and while debugging in Bot emulator comment out
+                // this code is about tenant id check and while debugging in Bot emulator comment out
+                // if (turnContext != null & !this.turnContextExtension.IsActivityFromExpectedTenant(turnContext))
 
                 if (turnContext.Activity.From.Id != "1905" && (turnContext != null & !this.turnContextExtension.IsActivityFromExpectedTenant(turnContext)))
-                //if (turnContext != null & !this.turnContextExtension.IsActivityFromExpectedTenant(turnContext))
                 {
                     this.logger.LogWarning($"Unexpected tenant id {turnContext?.Activity.Conversation.TenantId}");
                     return Task.CompletedTask;
@@ -152,8 +152,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
                     this.logger.LogWarning(ex, "Failed to send a typing indicator");
                 }
 
-
-                //added to enable debugging
                 if (turnContext.Activity.From.Id == "1905")
                 {
                     await this.botCommandResolver.ResolveBotCommandInPersonalChatAsync(
@@ -168,13 +166,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
                 {
                     case ConversationTypePersonal:
                         await this.botCommandResolver.ResolveBotCommandInPersonalChatAsync(
-                            message,
-                            turnContext,
-                            cancellationToken).ConfigureAwait(false);
-                        break;
-
-                    case ConversationTypeChannel:
-                        await this.botCommandResolver.ResolveBotCommandInTeamChatAsync(
                             message,
                             turnContext,
                             cancellationToken).ConfigureAwait(false);
@@ -219,7 +210,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
                 }
 
                 if (activity.From.Id == "1905" || ((activity.Conversation.ConversationType.ToLower() == ConversationTypePersonal)))
-                //if (activity.Conversation.ConversationType.ToLower() == ConversationTypePersonal)
                 {
                     await this.conversationService.SendWelcomeCardInPersonalChatAsync(activity.MembersAdded, turnContext, cancellationToken).ConfigureAwait(false);
                     return;

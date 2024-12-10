@@ -22,33 +22,17 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
     public class BotController : ControllerBase
     {
         private readonly IBotFrameworkHttpAdapter adapter;
-        private readonly IBot expertBot;
         private readonly IBot userBot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BotController"/> class.
         /// </summary>
         /// <param name="adapter">Bot adapter.</param>
-        /// <param name="expertBot"> Instance of Expert bot.</param>
         /// <param name="userBot"> Instance of User bot.</param>
-        public BotController(IBotFrameworkHttpAdapter adapter, FaqPlusExpertBot expertBot, FaqPlusUserBot userBot)
+        public BotController(IBotFrameworkHttpAdapter adapter, FaqPlusUserBot userBot)
         {
             this.adapter = adapter;
-            this.expertBot = expertBot;
             this.userBot = userBot;
-        }
-
-        /// <summary>
-        /// Executing the Post Async method for Expert bot.
-        /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        [HttpPost]
-        [Route("expert")]
-        public async Task PostExpertAsync()
-        {
-            // Delegate the processing of the HTTP POST to the adapter.
-            // The adapter will invoke the bot.
-            await this.adapter.ProcessAsync(this.Request, this.Response, this.expertBot).ConfigureAwait(false);
         }
 
         /// <summary>
