@@ -50,7 +50,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
         private readonly string appBaseUri;
         private readonly IBotCommandResolver botCommandResolver;
         private readonly IConversationService conversationService;
-        private readonly ITaskModuleActivity taskModuleActivity;
         private readonly TurnContextExtension turnContextExtension;
 
         /// <summary>
@@ -60,14 +59,11 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
         /// <param name="logger">Instance to send logs to the Application Insights service.</param>
         /// <param name="botCommandResolver">Resolves bot command.</param>
         /// <param name="conversationService">Conversation service to send welcome card.</param>
-        /// <param name="taskModuleActivity">Instance to call teams activity when task module is invoked in teams chat.</param>
-        /// <param name="turnContextExtension">Turn context extension object.</param>
         public FaqPlusUserBot(
             IOptionsMonitor<BotSettings> optionsAccessor,
             ILogger<FaqPlusUserBot> logger,
             IBotCommandResolver botCommandResolver,
             IConversationService conversationService,
-            ITaskModuleActivity taskModuleActivity,
             TurnContextExtension turnContextExtension)
         {
             if (optionsAccessor == null)
@@ -80,8 +76,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.botCommandResolver = botCommandResolver ?? throw new ArgumentNullException(nameof(botCommandResolver));
             this.conversationService = conversationService ?? throw new ArgumentNullException(nameof(conversationService));
-            this.taskModuleActivity = taskModuleActivity ?? throw new ArgumentNullException(nameof(taskModuleActivity));
-            this.turnContextExtension = turnContextExtension ?? throw new ArgumentNullException(nameof(turnContextExtension));
+            this.turnContextExtension = turnContextExtension;
         }
 
         /// <summary>
@@ -209,7 +204,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
                     return;
                 }
 
-                if (activity.From.Id == "1905" || ((activity.Conversation.ConversationType.ToLower() == ConversationTypePersonal)))
+                if (activity.From.Id == "1905" || activity.Conversation.ConversationType.ToLower() == ConversationTypePersonal)
                 {
                     await this.conversationService.SendWelcomeCardInPersonalChatAsync(activity.MembersAdded, turnContext, cancellationToken).ConfigureAwait(false);
                     return;
@@ -221,61 +216,5 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Bots
                 throw;
             }
         }
-
-        /// <summary>
-        /// Invoke when user clicks on edit button on a question in SME team.
-        /// This is to support backward compatibility for legacy bot.
-        /// </summary>
-        /// <param name="turnContext">Context object containing information cached for a single turn of conversation with a user.</param>
-        /// <param name="taskModuleRequest">Task module invoke request value payload.</param>
-        /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// Reference link: https://docs.microsoft.com/en-us/dotnet/api/microsoft.bot.builder.teams.teamsactivityhandler.onteamstaskmodulefetchasync?view=botbuilder-dotnet-stable.
-        /// </remarks>
-        protected override Task<TaskModuleResponse> OnTeamsTaskModuleFetchAsync(
-            ITurnContext<IInvokeActivity> turnContext,
-            TaskModuleRequest taskModuleRequest,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                return this.taskModuleActivity.OnFetchAsync(taskModuleRequest, this.appBaseUri);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, $"Error editing question : {ex.Message}", SeverityLevel.Error);
-                return default;
-            }
-        }
-
-        /// <summary>
-        /// Invoked when the user submits a edited question from SME team.
-        /// This is to support backward compatibility for legacy bot.
-        /// </summary>
-        /// <param name="turnContext">Context object containing information cached for a single turn of conversation with a user.</param>
-        /// <param name="taskModuleRequest">Task module invoke request value payload.</param>
-        /// <param name="cancellationToken">Propagates notification that operations should be canceled.</param>
-        /// <returns>A task that represents the work queued to execute.</returns>
-        /// <remarks>
-        /// Reference link: https://docs.microsoft.com/en-us/dotnet/api/microsoft.bot.builder.teams.teamsactivityhandler.onteamstaskmodulesubmitasync?view=botbuilder-dotnet-stable.
-        /// </remarks>
-        protected override async Task<TaskModuleResponse> OnTeamsTaskModuleSubmitAsync(
-            ITurnContext<IInvokeActivity> turnContext,
-            TaskModuleRequest taskModuleRequest,
-            CancellationToken cancellationToken)
-        {
-            try
-            {
-                return await this.taskModuleActivity.OnSubmitAsync(turnContext, this.appBaseUri);
-            }
-            catch (Exception ex)
-            {
-                this.logger.LogError(ex, $"Error submitting the question : {ex.Message}", SeverityLevel.Error);
-                return default;
-            }
-        }
-
-
     }
 }
