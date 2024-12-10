@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/github")]
     public class GithubExtentionController : ControllerBase
     {
         [HttpPost("agent")]

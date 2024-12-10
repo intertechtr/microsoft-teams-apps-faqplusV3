@@ -31,12 +31,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus
     /// </summary>
     public class Startup
     {
-        private readonly Uri endpoint;
-        private readonly AzureKeyCredential credential;
-        private readonly string projectName;
-        private readonly string deploymentName;
-        private readonly string qnAServicerSubscriptionKey;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Startup"/> class.
         /// </summary>
@@ -44,11 +38,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this.qnAServicerSubscriptionKey = this.Configuration.GetValue<string>("QuestionAnswerSubscriptionKey");
-            this.endpoint = new Uri(this.Configuration.GetValue<string>("QuestionAnswerApiEndpointUrl"));
-            this.credential = new AzureKeyCredential(this.Configuration.GetValue<string>("QuestionAnswerSubscriptionKey"));
-            this.projectName = this.Configuration.GetValue<string>("QuestionAnswerProjectName");
-            this.deploymentName = this.Configuration.GetValue<string>("DeploymentName");
     }
 
         /// <summary>
