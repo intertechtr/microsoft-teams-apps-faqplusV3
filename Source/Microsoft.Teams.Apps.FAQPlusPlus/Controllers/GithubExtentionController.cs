@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Teams.Apps.FAQPlusPlus.Models;
 
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
@@ -15,12 +16,14 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
         }
 
         [HttpPost("agent")]
-        public IActionResult Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] Request userRequest)
+        public IActionResult Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
         {
-            // Implement your logic here
-            this.logger.LogInformation("GitHubToken = " + githubToken);
-            this.logger.LogInformation(userRequest.ToString());
-            return Ok("{'message':'Hello World'}");
+            foreach (var message in copilotData.Messages)
+            {
+                this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
+            }
+
+            return Ok("{\"id\": \"1234567890\", \"model\": \"llama2-70b-chat\",  \"choices\": [    {      \"index\": 0,     \"finish_reason\": \"stop\",     \"message\": {        \"role\": \"assistant\",        \"content\": \"Hello World\"      }    }  ],  \"created\": 1234567890,  \"object\": \"chat.completion\",  \"usage\": {    \"prompt_tokens\": 205,    \"completion_tokens\": 5,    \"total_tokens\": 210  }}");
         }
 
         [HttpGet("callback")]
