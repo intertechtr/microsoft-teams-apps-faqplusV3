@@ -27,7 +27,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
                 this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
             }
 
-            string responseString = "{\"message\": { \"role\": \"assistant\", \"content\": \"Hello World\" } }";
+            string responseString = "{\"id\":\"chatcmpl-123\",\"object\":\"chat.completion.chunk\",\"created\":1694268190,\"model\":\"gpt-3.5-turbo-0125\", \"system_fingerprint\": \"fp_44709d6fcb\", \"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hello world.\"},\"logprobs\":null,\"finish_reason\":null}]}";
 
             await this.Response.WriteAsync(responseString);
             await this.Response.Body.FlushAsync();
