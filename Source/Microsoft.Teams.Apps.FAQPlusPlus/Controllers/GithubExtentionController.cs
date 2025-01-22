@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
