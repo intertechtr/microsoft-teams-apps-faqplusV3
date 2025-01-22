@@ -7,19 +7,19 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
     [Route("api/github")]
     public class GithubExtentionController : ControllerBase
     {
-        private readonly ILogger<GithubExtentionController> _logger;
+        private readonly ILogger<GithubExtentionController> logger;
 
         public GithubExtentionController(ILogger<GithubExtentionController> logger)
         {
-            _logger = logger;
+            this.logger = logger;
         }
 
         [HttpPost("agent")]
         public IActionResult Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] Request userRequest)
         {
             // Implement your logic here
-            _logger.LogInformation("GitHubToken = " + githubToken);
-            _logger.LogInformation(userRequest.toString());
+            this.logger.LogInformation("GitHubToken = " + githubToken);
+            this.logger.LogInformation(userRequest.ToString());
             return Ok("{'message':'Hello World'}");
         }
 
