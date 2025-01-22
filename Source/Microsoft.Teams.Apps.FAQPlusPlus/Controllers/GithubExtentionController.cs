@@ -27,7 +27,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
                 this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
             }
 
-            string responseString = "data: {\"object\":\"chat.completion.chunk\", \"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hello world.\"}}]}";
+            string responseString = "data: {\"object\":\"chat.completion.chunk\", \"choices\":[{\"index\":0,\"delta\":{\"role\":\"assistant\",\"content\":\"Hello world.\"}}]}\n\ndata: [DONE]\n\n";
 
             await this.Response.WriteAsync(responseString);
             await this.Response.Body.FlushAsync();
