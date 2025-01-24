@@ -6,6 +6,7 @@ using Microsoft.Teams.Apps.FAQPlusPlus.Common.Components;
 using Microsoft.Teams.Apps.FAQPlusPlus.Models;
 using NuGet.Common;
 using System.Threading.Tasks;
+using System.Text.Json;
 
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
@@ -35,7 +36,9 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 
             var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
 
-            string responseString = $"data: {{\"object\":\"chat.completion.chunk\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{answer}\"}}}}]}}\n\ndata: [DONE]\n\n";
+            this.logger.LogInformation($"Answer at Github Extension Level: {answer}");
+
+            string responseString = $"data: {{\"object\":\"chat.completion.chunk\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\ndata: [DONE]\n\n";
 
             await this.Response.WriteAsync(responseString);
             await this.Response.Body.FlushAsync();
