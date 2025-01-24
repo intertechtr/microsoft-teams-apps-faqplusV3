@@ -114,7 +114,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
             await turnContext.SendActivityAsync(messageActivity).ConfigureAwait(false);
         }
 
-        private async Task<string> ConsolidatedAnswer(string userMessage, string userName )
+        public async Task<string> ConsolidatedAnswer(string userMessage, string userName )
         {
             var question = userMessage;
             var context = await GetSearchResult(question);

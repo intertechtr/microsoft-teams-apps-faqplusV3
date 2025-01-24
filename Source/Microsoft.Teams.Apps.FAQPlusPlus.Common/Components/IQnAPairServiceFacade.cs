@@ -22,5 +22,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Common.Components
         /// <param name="message">Text message.</param>
         /// <returns>A task that represents the work queued to execute.</returns>
         Task GetReplyToQnAAsync(ITurnContext<IMessageActivity> turnContext, IMessageActivity message);
+
+        Task<string> ConsolidatedAnswer(string userMessage, string userName);
     }
 }
