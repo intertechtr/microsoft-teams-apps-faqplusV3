@@ -7,6 +7,7 @@ using Microsoft.Teams.Apps.FAQPlusPlus.Models;
 using NuGet.Common;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System;
 
 namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 {
@@ -36,11 +37,17 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 
             var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
 
-            string responseString = $"data: {{\"object\":\"chat.completion.chunk\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\ndata: [DONE]\n\n";
+            string guid = Guid.NewGuid().ToString();
+            string unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+            string responseString = $"data: {{ \"id\":\"{guid}\", \"object\":\"chat.completion.chunk\", \"created\":\"{unixTimestamp}\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";
 
             this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
 
+            string doneString = "data: [DONE]\n\n";
+
             await this.Response.WriteAsync(responseString);
+            await this.Response.WriteAsync(doneString);
             await this.Response.Body.FlushAsync();
         }
 
