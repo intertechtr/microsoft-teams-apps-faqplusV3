@@ -36,9 +36,9 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 
             var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
 
-            this.logger.LogInformation($"Answer at Github Extension Level: {answer}");
-
             string responseString = $"data: {{\"object\":\"chat.completion.chunk\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\ndata: [DONE]\n\n";
+
+            this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
 
             await this.Response.WriteAsync(responseString);
             await this.Response.Body.FlushAsync();
