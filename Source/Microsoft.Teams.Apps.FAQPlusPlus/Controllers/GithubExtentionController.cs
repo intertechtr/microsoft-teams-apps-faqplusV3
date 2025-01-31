@@ -46,8 +46,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 
             string doneString = "data: [DONE]\n\n";
 
-            await this.Response.WriteAsync(responseString);
-            await this.Response.WriteAsync(doneString);
+            await this.Response.WriteAsync(responseString + doneString);
             await this.Response.Body.FlushAsync();
         }
 
