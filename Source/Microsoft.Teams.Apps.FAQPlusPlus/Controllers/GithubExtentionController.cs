@@ -40,8 +40,8 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             string guid = Guid.NewGuid().ToString();
             string unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
-            string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"type\":\"success\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";
- 
+            /*string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"type\":\"success\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";*/
+            string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";
             this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
 
             string doneString = "data: [DONE]\n\n";
