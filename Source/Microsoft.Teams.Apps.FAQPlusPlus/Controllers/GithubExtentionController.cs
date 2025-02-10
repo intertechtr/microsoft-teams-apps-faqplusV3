@@ -42,7 +42,6 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
 
             /*string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"type\":\"success\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";*/
             string responseString = $"data: {{ \"id\":\"chtcmp-123\",\"object\":\"chat.completion.chunk\", \"system_fingerprint\": \"fp_46409d6sgb\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}},\"logprobs\":null,\"finish_reason\":\"stop\"}}]}}\n\n";
-            finish_reason to "stop"
             this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
 
             string doneString = "data: [DONE]\n\n";
