@@ -24,20 +24,28 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             this.logger = logger;
         }
 
-       [HttpPost("agent")]
-        public async Task Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
+        [HttpPost("agent")]
+        public async Task<IActionResult> Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
         {
-            var msg = "";        
-            foreach (var message in copilotData.Messages)
+            if (copilotData?.Messages == null || !copilotData.Messages.Any())
             {
-                this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
-                msg = message.Content;
-            }        
-            var answer = await this.qnaService.ConsolidatedAnswer(msg, "");                  
+                return BadRequest(new { error = "No messages provided" });
+            }
+        
+            var lastMessage = copilotData.Messages.LastOrDefault();
+            if (lastMessage == null)
+            {
+                return BadRequest(new { error = "Invalid message format" });
+            }
+        
+            this.logger.LogInformation($"Role: {lastMessage.Role}, Content: {lastMessage.Content}");
+        
+            var answer = await this.qnaService.ConsolidatedAnswer(lastMessage.Content, "");
+        
             var response = new
             {
                 id = "chtcmp-" + Guid.NewGuid().ToString(),
-                object = "chat.completion",
+                @object = "chat.completion",
                 created = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                 choices = new[]
                 {
@@ -54,13 +62,9 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
                 }
             };
         
-            // Return as regular JSON
-            await JsonSerializer.SerializeAsync(
-                Response.Body,
-                response,
-                new JsonSerializerOptions { WriteIndented = false }
-            );
+            return Ok(response);
         }
+
 
         [HttpGet("callback")]
         public IActionResult Callback()
