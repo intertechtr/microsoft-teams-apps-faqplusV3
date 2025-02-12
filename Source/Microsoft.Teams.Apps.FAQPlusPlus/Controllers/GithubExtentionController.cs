@@ -24,7 +24,7 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             this.logger = logger;
         }
 
-        [HttpPost("agent")]
+       [HttpPost("agent")]
         public async Task Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
         {
             var msg = "";        
@@ -32,22 +32,34 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             {
                 this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
                 msg = message.Content;
-            }
+            }        
+            var answer = await this.qnaService.ConsolidatedAnswer(msg, "");                  
+            var response = new
+            {
+                id = "chtcmp-" + Guid.NewGuid().ToString(),
+                object = "chat.completion",
+                created = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                choices = new[]
+                {
+                    new
+                    {
+                        index = 0,
+                        message = new
+                        {
+                            role = "assistant",
+                            content = answer
+                        },
+                        finish_reason = "stop"
+                    }
+                }
+            };
         
-            var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
-        
-            string guid = Guid.NewGuid().ToString();
-            string unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-        
-            string responseString = $"data: {{ \"id\":\"chtcmp-123\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\": \"fp_46409d6sgb\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}},\"logprobs\":null,\"finish_reason\":null}}]}}\n\n";
-            this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
-        
-            await this.Response.WriteAsync(responseString);
-            await this.Response.Body.FlushAsync();
-        
-            string doneString = "data: [DONE]\n\n";
-            await this.Response.WriteAsync(doneString);
-            await this.Response.Body.FlushAsync();
+            // Return as regular JSON
+            await JsonSerializer.SerializeAsync(
+                Response.Body,
+                response,
+                new JsonSerializerOptions { WriteIndented = false }
+            );
         }
 
         [HttpGet("callback")]
