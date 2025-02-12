@@ -27,26 +27,26 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
         [HttpPost("agent")]
         public async Task Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
         {
-            var msg = "";
-
+            var msg = "";        
             foreach (var message in copilotData.Messages)
             {
                 this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
                 msg = message.Content;
             }
-
+        
             var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
-
+        
             string guid = Guid.NewGuid().ToString();
             string unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
-
-            /*string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"type\":\"success\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";*/
-            string responseString = $"data: {{ \"id\":\"chtcmp-123\",\"object\":\"chat.completion.chunk\", \"system_fingerprint\": \"fp_46409d6sgb\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}},\"logprobs\":null,\"finish_reason\":\"stop\"}}]}}\n\n";
+        
+            string responseString = $"data: {{ \"id\":\"chtcmp-123\",\"object\":\"chat.completion.chunk\",\"system_fingerprint\": \"fp_46409d6sgb\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}},\"logprobs\":null,\"finish_reason\":null}}]}}\n\n";
             this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
-
+        
+            await this.Response.WriteAsync(responseString);
+            await this.Response.Body.FlushAsync();
+        
             string doneString = "data: [DONE]\n\n";
-
-            await this.Response.WriteAsync(responseString + doneString);
+            await this.Response.WriteAsync(doneString);
             await this.Response.Body.FlushAsync();
         }
 
