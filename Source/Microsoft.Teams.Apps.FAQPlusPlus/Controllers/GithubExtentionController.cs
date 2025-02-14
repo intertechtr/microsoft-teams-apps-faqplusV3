@@ -24,47 +24,31 @@ namespace Microsoft.Teams.Apps.FAQPlusPlus.Controllers
             this.logger = logger;
         }
 
-        [HttpPost("agent")]
-        public async Task<IActionResult> Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
+   [HttpPost("agent")]
+        public async Task Agent([FromHeader(Name = "X-GitHub-Token")] string githubToken, [FromBody] CopilotData copilotData)
         {
-            if (copilotData?.Messages == null || !copilotData.Messages.Any())
-            {
-                return BadRequest(new { error = "No messages provided" });
-            }
-        
-            var lastMessage = copilotData.Messages.LastOrDefault();
-            if (lastMessage == null)
-            {
-                return BadRequest(new { error = "Invalid message format" });
-            }
-        
-            this.logger.LogInformation($"Role: {lastMessage.Role}, Content: {lastMessage.Content}");
-        
-            var answer = await this.qnaService.ConsolidatedAnswer(lastMessage.Content, "");
-        
-            var response = new
-            {
-                id = "chtcmp-" + Guid.NewGuid().ToString(),
-                @object = "chat.completion",
-                created = DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                choices = new[]
-                {
-                    new
-                    {
-                        index = 0,
-                        message = new
-                        {
-                            role = "assistant",
-                            content = answer
-                        },
-                        finish_reason = "stop"
-                    }
-                }
-            };
-        
-            return Ok(response);
-        }
+            var msg = "";
 
+            foreach (var message in copilotData.Messages)
+            {
+                this.logger.LogInformation($"Role: {message.Role}, Content: {message.Content}");
+                msg = message.Content;
+            }
+
+            var answer = await this.qnaService.ConsolidatedAnswer(msg, "");
+
+            string guid = Guid.NewGuid().ToString();
+            string unixTimestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+            /*string responseString = $"data: {{ \"object\":\"chat.completion.chunk\", \"type\":\"success\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}}}}]}}\n\n";*/
+            string responseString = $"data: {{ \"id\":\"chtcmp-123\",\"object\":\"chat.completion.chunk\", \"system_fingerprint\": \"fp_46409d6sgb\", \"choices\":[{{\"index\":0,\"delta\":{{\"role\":\"assistant\",\"content\":\"{JsonEncodedText.Encode(answer)}\"}},\"logprobs\":null,\"finish_reason\":null}}]}}\n\n";
+            this.logger.LogInformation($"Response at Github Extension Level: {responseString}");
+
+            string doneString = "data: [DONE]\n\n";
+
+            await this.Response.WriteAsync(responseString + doneString);
+            await this.Response.Body.FlushAsync();
+        }
 
         [HttpGet("callback")]
         public IActionResult Callback()
